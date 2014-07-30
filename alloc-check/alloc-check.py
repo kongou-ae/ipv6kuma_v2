@@ -13,7 +13,7 @@ import time
 
 def get_jpnic_list():
     '''
-    JPNIC$B$N%j%9%H$r<hF@$7$F%U%!%$%k$K=q$-9~$`(B
+    JPNICのリストを取得してファイルに書き込む
     '''
 
     html = requests.get('https://www.nic.ad.jp/ja/dns/ipv6-addr-block.html')
@@ -28,7 +28,7 @@ def get_jpnic_list():
 
 def do_whois(prefix):
     '''
-    $B0z?t$r(BJPNIC WHOIS$B$KLd$$9g$o$;!"AH?%L>$rLa$9(B
+    引数をJPNIC WHOISに問い合わせ、組織名を戻す
     '''
 
     result = subprocess.Popen(['/bin/whois','-h','whois.nic.ad.jp','{0}/e'.format(prefix)], stdout=subprocess.PIPE).communicate()[0]
@@ -41,7 +41,7 @@ def do_whois(prefix):
 
 def diff_file(new,old):
     '''
-    $BFs$D$N%U%!%$%k$r<u$1<h$j!":9J,$r(BSTR$B$GLa$9(B
+    二つのファイルを受け取り、差分をSTRで戻す
     '''
 
     result = ''
@@ -58,24 +58,24 @@ def diff_file(new,old):
 # ----------------------------------------------
 
 def main():
-    ''' $B%a%$%s=hM}(B '''
-    #ipv6kuma$B3JG<%G%#%l%/%H%j$r;XDj(B
+    ''' メイン処理 '''
+    #ipv6kuma格納ディレクトリを指定
     directory = '/opt/ipv6kuma_v2/alloc-check'
     new = '{0}/new_jpnic.txt'.format(directory)
     old = '{0}/old_jpnic.txt'.format(directory)
 
-    #$BA02s$N%j%9%H$r%P%C%/%"%C%W$9$k(B
+    #前回のリストをバックアップする
     #shutil.copyfile('{0}/new_jpnic.txt'.format(directory),'{0}/old_jpnic.txt'.format(directory))
 
-    #$B:G?7$N%j%9%H$r:n@.$9$k(B
+    #最新のリストを作成する
     get_jpnic_list()
 
-    #$B%j%9%H$rHf3S$7!":9J,$r:n$k!#(B
+    #リストを比較し、差分を作る。
     diff = diff_file('{0}'.format(new),'{0}'.format(old))
     for i in diff.splitlines():
         j = (do_whois(i))
         time.sleep(10)
-        print("{0}$B$,(B{1}$B$r<hF@$7$?%/%^!<(B".format(j, i))
+        print("{0}が{1}を取得したクマー".format(j, i))
 
 
 main()
