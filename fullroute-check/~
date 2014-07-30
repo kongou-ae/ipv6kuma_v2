@@ -1,0 +1,53 @@
+#!~/.virtualenvs/py3.3/bin/python
+# -*- coding:utf-8 -*-
+
+import re
+import datetime
+import matplotlib.pyplot as plt
+
+def get_value(path):
+
+    graphvalue = []
+    graphdate = []
+    
+    valueregex = re.compile(',(.+$)')
+    dateregex = re.compile('(^.+),')
+
+    for line in open(path, 'r'):
+        graphvalue.append("".join(valueregex.findall(line)))
+        src = "".join(dateregex.findall(line))
+        src = src.replace('/', ',', 2)
+        srclist = src.split(',')
+        src = datetime.date(int(srclist[0]), int(srclist[1]), int(srclist[2]))
+        print(src)
+
+        graphdate.append(src)
+    
+    return graphvalue, graphdate
+
+def make_graph(value,date):
+    x = []
+    y = []
+
+    x = date
+    y = value
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111)
+    #グラフの定義
+    axes.set_xlabel('date')
+    axes.set_ylabel('routes')
+    axes.set_title('IPv6 advertized route')
+    
+    #グラフを描画
+    axes.plot(x, y)
+    fig.savefig('fullroute.png')
+    plt.clf()
+
+
+txt_path = "/var/ipv6kuma/fullroute/sumGraph.txt"
+#ファイルからグラフの描画に必要なデータを取得する
+value,data = get_value(txt_path)
+
+#取得したデータを元にグラフを描画する
+make_graph(value,data)
