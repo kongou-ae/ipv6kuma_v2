@@ -78,4 +78,5 @@ def main():
         print("{0}が{1}を取得したクマー".format(j, i))
 
 
-main()
+if __name__ == '__main__':
+    main()
