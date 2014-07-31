@@ -8,6 +8,8 @@ import re
 import shutil
 import difflib
 import time
+from twitter import *
+import json
 
 # ----------------------------------------------
 
@@ -57,6 +59,26 @@ def diff_file(new,old):
 
 # ----------------------------------------------
 
+def post_twitter(msg):
+    authcode = json.load(open('/opt/ipv6kuma_v2/twitter.json','r'))
+    OAUTH_TOKEN = authcode[0]['oauth_token']
+    OAUTH_SECRET =  authcode[0]['oauth_token_secret']
+    CONSUMER_KEY = authcode[0]['consumer_key']
+    CONSUMER_SECRET = authcode[0]['consumer_secret']
+
+    t = Twitter(
+                auth=OAuth(
+                            OAUTH_TOKEN,
+                            OAUTH_SECRET,
+                            CONSUMER_KEY,
+                            CONSUMER_SECRET
+                            )
+                )
+
+    t.statuses.update(status = '{0}'.format(msg))
+
+# ----------------------------------------------
+
 def main():
     ''' メイン処理 '''
     #ipv6kuma格納ディレクトリを指定
@@ -65,7 +87,7 @@ def main():
     old = '{0}/old_jpnic.txt'.format(directory)
 
     #前回のリストをバックアップする
-    #shutil.copyfile('{0}/new_jpnic.txt'.format(directory),'{0}/old_jpnic.txt'.format(directory))
+    shutil.copyfile('{0}/new_jpnic.txt'.format(directory),'{0}/old_jpnic.txt'.format(directory))
 
     #最新のリストを作成する
     get_jpnic_list()
@@ -75,8 +97,8 @@ def main():
     for i in diff.splitlines():
         j = (do_whois(i))
         time.sleep(10)
-        print("{0}が{1}を取得したクマー".format(j, i))
-
+        msg = '{0}が{1}を取得したクマー'.format(j, i)
+        post_twitter(msg)
 
 if __name__ == '__main__':
     main()
