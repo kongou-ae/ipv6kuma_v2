@@ -70,15 +70,7 @@ def post_twitter(msg):
     CONSUMER_KEY = authcode[0]['consumer_key']
     CONSUMER_SECRET = authcode[0]['consumer_secret']
 
-    t = Twitter(
-                auth=OAuth(
-                            OAUTH_TOKEN,
-                            OAUTH_SECRET,
-                            CONSUMER_KEY,
-                            CONSUMER_SECRET
-                            )
-                )
-
+    t = Twitter(auth=OAuth(OAUTH_TOKEN, OAUTH_SECRET, CONSUMER_KEY, CONSUMER_SECRET))
     t.statuses.update(status = '{0}'.format(msg))
 
 # ----------------------------------------------
