@@ -60,6 +60,10 @@ def diff_file(new,old):
 # ----------------------------------------------
 
 def post_twitter(msg):
+    '''
+    msg変数をtwitterにPostする
+    '''
+
     authcode = json.load(open('/opt/ipv6kuma_v2/twitter.json','r'))
     OAUTH_TOKEN = authcode[0]['oauth_token']
     OAUTH_SECRET =  authcode[0]['oauth_token_secret']
