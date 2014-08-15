@@ -8,6 +8,8 @@ import shutil
 import datetime
 from twitter import *
 import json
+import telnetlib
+import pexpect
 
 def get_fullroute():
     '''
@@ -30,6 +32,37 @@ def get_fullroute():
                 newRoute.write(regex.match(line).group() + '\n')
 
 # ----------------------------------------------
+
+def get_fullroute_wide():
+    '''
+    wideのroute-serverからフルルートを取得し、ベストパスをファイルに書き込む
+    '''
+
+    # wideのroute-serverに接続しフルルートを取得する。
+    prompt = 'route-views.wide.routeviews.org> '
+
+    telnet = pexpect.spawn('telnet route-views.wide.routeviews.org')
+    telnet.expect(prompt)
+    telnet.sendline('ter len 0')
+    telnet.expect(prompt)
+    telnet.sendline('show bgp ipv6 neighbors 2001:200:0:fe00::9d4:0 routes')
+    telnet.expect(prompt)
+    telnet.sendline('ter len 24')
+    fullroute = telnet.before
+    telnet.close
+
+    with open('/opt/ipv6kuma_v2/fullroute-check/bgp-table-snapshot.txt',mode='w',encoding='utf-8') as f:
+        f.write('{0}'.format(fullroute.decode('utf-8')))
+
+    # 書き込んだファイルを読み込み、正規表現でベストパスを抽出し、ファイルに書き込む
+    regex = re.compile(r'^\*.\s([\da-zA-Z]{0,4}:)*\/\d{1,3}')
+    newRoute = open('/opt/ipv6kuma_v2/fullroute-check/new-route.txt',mode='w',encoding='utf-8')
+    with open('/opt/ipv6kuma_v2/fullroute-check/bgp-table-snapshot.txt',mode='r',encoding='utf-8') as f:
+        for line in f:
+            if regex.match(line):
+                newRoute.write(regex.match(line).group() + '\n')
+
+# ----------------------------------------------$
 
 def check_route():
     '''
@@ -102,8 +135,8 @@ def main():
     # 前日部分をバックアップする
     shutil.copyfile('{0}'.format(new),'{0}'.format(old))
 
-    # HEから最新のフルルートを取得する
-    get_fullroute()
+    # wideから最新のフルルートを取得する
+    get_fullroute_wide()
 
     # ブイロクマのコメントを生成
     post = check_route()
