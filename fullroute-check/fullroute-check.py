@@ -41,7 +41,7 @@ def get_fullroute_wide():
     # wideのroute-serverに接続しフルルートを取得する。
     prompt = 'route-views.wide.routeviews.org> '
 
-    telnet = pexpect.spawn('telnet route-views.wide.routeviews.org')
+    telnet = pexpect.spawn('telnet route-views.wide.routeviews.org', timeout=15)
     telnet.expect(prompt)
     telnet.sendline('ter len 0')
     telnet.expect(prompt)
