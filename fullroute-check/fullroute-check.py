@@ -10,6 +10,7 @@ from twitter import *
 import json
 import telnetlib
 import pexpect
+import time
 
 def get_fullroute():
     '''
@@ -136,7 +137,15 @@ def main():
     shutil.copyfile('{0}'.format(new),'{0}'.format(old))
 
     # wideから最新のフルルートを取得する
-    get_fullroute_wide()
+    attempt = 0
+    while attempt < 3:
+        try:
+            get_fullroute_wide()
+            break
+        except UnicodeDecodeError:
+            time.sleep(5)
+            print('error')
+            attempt = attempt + 1
 
     # ブイロクマのコメントを生成
     post = check_route()
