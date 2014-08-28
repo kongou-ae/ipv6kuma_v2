@@ -144,7 +144,6 @@ def main():
             break
         except UnicodeDecodeError:
             time.sleep(5)
-            print('error')
             attempt = attempt + 1
 
     # ブイロクマのコメントを生成
